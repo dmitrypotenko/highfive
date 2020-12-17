@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "822882102457",
+    "project_id": "highfive-311f2",
+    "storage_bucket": "highfive-311f2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:822882102457:android:77462996127c1f389f7f68",
+        "android_client_info": {
+          "package_name": "com.potenko.highfive"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "822882102457-nvuq125nl0j4tiiibnf4r15khib5uo56.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.potenko.highfive",
+            "certificate_hash": "777b4d16ba37d50830935390bc996ef9f9fce957"
+          }
+        },
+        {
+          "client_id": "822882102457-f3flmkvrh6kjpqgt580575ke2c1tl5k3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoaAPJBOkSi53QRjd2P5DMOeI1xkDR-30"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "822882102457-f3flmkvrh6kjpqgt580575ke2c1tl5k3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
