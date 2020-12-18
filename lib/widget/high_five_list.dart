@@ -19,7 +19,7 @@ class HighFiveList extends MaterialPageRoute {
                         child: new Column(
                           children: snapshot.data
                               .map(
-                                (highfive) => new GestureDetector(
+                                (highfive) => new InkWell(
                                   onTap: () => Navigator.of(context).push(new ContactsRoute(highfive)),
                                   child: new Container(
                                     child: new Column(

@@ -39,7 +39,7 @@ class App extends StatefulWidget {
   _AppState createState() => _AppState();
 }
 
-class _AppState extends State<App> {
+class _AppState extends State<App> with WidgetsBindingObserver {
   // Set default `_initialized` and `_error` state to false
   bool _initialized = false;
   bool _error = false;
@@ -71,6 +71,13 @@ class _AppState extends State<App> {
     askForPermissions();
     _highfives = readHighFives();
     super.initState();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      changeNotifierHighFive.notifyListeners();
+    }
   }
 
   Future<PermissionStatus> askForPermissions() async {
@@ -120,7 +127,18 @@ class _AppState extends State<App> {
                 handleHighFiveData(context, highFiveData);
               },
             ),
-            duration: new Duration(seconds: 10),
+            duration: new Duration(seconds: 5),
+            trailing: Builder(builder: (context) {
+              return ElevatedButton(
+                  onPressed: () {
+                    OverlaySupportEntry.of(context).dismiss();
+                  },
+                  style: new ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.white)),
+                  child: Text(
+                    'Ага',
+                    style: new TextStyle(color: Colors.black),
+                  ));
+            }),
           );
         }
       });
@@ -175,11 +193,14 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 Future<void> handleHighFiveData(BuildContext context, HighFiveData highFiveData) async {
-  acknowledge(highFiveData.documentId);
+  if (highFiveData.acknowledged == false) {
+    acknowledge(highFiveData.documentId);
+    highFiveData.acknowledged = true;
+  }
   List<HighFive> highfives = await getHighFives();
   String contact = await getContacts().then((contacts) => findContact(contacts, highFiveData.sender).displayName);
-  Navigator.of(context).push(new HighFiveRoute(
-      highfives.firstWhere((highfive) => highfive.id == highFiveData.highfiveId), highFiveData.comment, contact));
+  Navigator.of(context)
+      .push(new HighFiveRoute(highfives.firstWhere((highfive) => highfive.id == highFiveData.highfiveId), highFiveData.comment, contact));
 }
 
 Contact findContact(Iterable<Contact> contacts, String senderPhone) {

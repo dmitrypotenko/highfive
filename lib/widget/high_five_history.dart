@@ -1,12 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:highfive/firebase/loading.dart';
 import 'package:highfive/main.dart';
 import 'package:highfive/model/change_notifier_highfive.dart';
 import 'package:highfive/model/high_five_data.dart';
-import 'package:highfive/route/contacts.dart';
 import 'package:highfive/widget/high_five_list.dart';
 import 'package:provider/provider.dart';
 
@@ -17,9 +13,11 @@ class HighFiveHistory extends StatelessWidget {
     Widget child = new Text('У вас нет непросмотренных пятюнь');
     if (highFivesModel.highFives.length > 0) {
       child = new ListView(
-        children: highFivesModel.highFives
-            .map(
-              (highfive) => new ListTile(
+        children: ListTile.divideTiles(
+          context: context,
+          tiles: highFivesModel.highFives.map(
+            (highfive) => new InkWell(
+              child: new ListTile(
                 leading: Icon(
                   Icons.arrow_back,
                   color: Colors.green,
@@ -27,16 +25,20 @@ class HighFiveHistory extends StatelessWidget {
                 title: new FutureBuilder<String>(
                   future: getContacts().then((contacts) => findContact(contacts, highfive.sender).displayName),
                   builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-                    if (snapshot.hasData) {
-                      return new Text(snapshot.data);
+                    if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
+                      return buildRichText(highfive, snapshot.data);
                     }
-                    return new Text(highfive.sender);
+                    return buildRichText(highfive, highfive.sender);
                   },
                 ),
-                onTap: () async => handleHighFiveData(context, highfive),
+                trailing: new Text(DateTime.fromMillisecondsSinceEpoch(highfive.timestamp * 1000).toString()),
               ),
-            )
-            .toList(),
+              onTap: () async {
+                handleHighFiveData(context, highfive);
+              },
+            ),
+          ),
+        ).toList(),
       );
     }
     return new Scaffold(
@@ -51,9 +53,47 @@ class HighFiveHistory extends StatelessWidget {
       ),
     );
   }
+
+  ChangeNotifierProvider<ValueNotifier<bool>> buildRichText(HighFiveData highfive, String text) {
+    return ChangeNotifierProvider<ValueNotifier<bool>>(
+      create: (BuildContext context) {
+        var valueNotifier = new ValueNotifier<bool>(highfive.acknowledged);
+        highfive.acknowledgedNotifier = valueNotifier;
+        return valueNotifier;
+      },
+      child: new SenderRichText(text),
+    );
+  }
+}
+
+class SenderRichText extends StatelessWidget {
+  String text;
+
+  SenderRichText(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return new Consumer<bool>(builder: (context, acknowledged, child) {
+      var icon = acknowledged
+          ? null
+          : new Icon(
+        Icons.fiber_new_outlined,
+        color: Colors.deepPurpleAccent,
+        size: 30,
+      );
+      return new RichText(
+          text: new TextSpan(
+              children: [new TextSpan(text: text), if (icon != null) WidgetSpan(child: icon)],
+              style: new TextStyle(color: Colors.black, fontSize: 20)));
+    });
+
+
+  }
 }
 
 HighFiveData parseHighFiveData(Map<String, dynamic> data) {
-  var highFiveData = new HighFiveData(data['sender'], int.parse(data['highfiveId']), data['comment'], int.parse(data['timestamp']), data['id']);
+  var highFiveData =
+      new HighFiveData(data['sender'], int.parse(data['highfiveId']), data['comment'], int.parse(data['timestamp']), data['id']);
+  highFiveData.acknowledged = false;
   return highFiveData;
 }
