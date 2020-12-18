@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -8,10 +7,11 @@ import 'package:highfive/error/error.dart';
 import 'package:highfive/firebase/loading.dart';
 import 'package:highfive/model/high_five.dart';
 import 'package:highfive/model/high_five_data.dart';
+import 'package:highfive/repository/repository.dart';
 import 'package:highfive/route/high_five_route.dart';
 import 'package:overlay_support/overlay_support.dart';
-import 'package:path/path.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:vibration/vibration.dart';
 
@@ -45,6 +45,7 @@ class _AppState extends State<App> {
   bool _error = false;
   User _user = null;
   bool listening = false;
+  Future<List<HighFiveData>> _highfives;
 
   Database db;
 
@@ -68,21 +69,8 @@ class _AppState extends State<App> {
   void initState() {
     initializeFlutterFire();
     askForPermissions();
-
+    _highfives = readHighFives();
     super.initState();
-  }
-
-  Future<void> initDb() async {
-    WidgetsFlutterBinding.ensureInitialized();
-    var databasePath = await getDatabasesPath();
-    db = await openDatabase(join(databasePath, 'highfive.db'), onCreate: (db, version) {
-      return db
-          .execute(
-            'CREATE TABLE highfive(id TEXT PRIMARY KEY, highfive_id INTEGER, comment TEXT, timestamp INTEGER, sender_id INTEGER)',
-          )
-          .then((value) => db.execute('CREATE TABLE phone(id INTEGER PRIMARY KEY autoincrement, phone_number TEXT)'))
-      .then((value) => db.execute('CREATE TABLE send_to(id INTEGER PRIMARY KEY autoincrement, highfive_id TEXT, phone_id INTEGER)'));
-    }, version: 1);
   }
 
   Future<PermissionStatus> askForPermissions() async {
@@ -108,23 +96,28 @@ class _AppState extends State<App> {
     if (!listening) {
       FirebaseMessaging.instance.getInitialMessage().then((message) {
         if (message != null) {
-          handleHighFiveMessage(context, message);
+          var highFiveData = parseHighFiveData(message.data);
+          handleHighFiveData(context, highFiveData);
         }
       });
 
       FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-        handleHighFiveMessage(context, message);
+        var highFiveData = parseHighFiveData(message.data);
+        handleHighFiveData(context, highFiveData);
       });
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        var highFiveData = parseHighFiveData(message.data);
+        changeNotifierHighFive.add(highFiveData);
+        insertReceivedHighFive(highFiveData);
         Vibration.vibrate(duration: 300);
         if (message.notification != null) {
           showSimpleNotification(
             GestureDetector(
               child: new Text("Вам прислали пятюню!"),
               onTap: () async {
-                handleHighFiveMessage(context, message);
+                handleHighFiveData(context, highFiveData);
               },
             ),
             duration: new Duration(seconds: 10),
@@ -155,27 +148,38 @@ class _AppState extends State<App> {
     if (_user == null) {
       return SetPhoneNumberWidget();
     } else {
-      return new HighFiveHistory();
+      return new FutureBuilder<List<HighFiveData>>(
+        future: _highfives,
+        builder: (BuildContext context, AsyncSnapshot<List<HighFiveData>> snapshot) {
+          if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
+            changeNotifierHighFive.highFives = snapshot.data;
+            return new ChangeNotifierProvider(
+              create: (context) => changeNotifierHighFive,
+              child: new HighFiveHistory(),
+            );
+          } else {
+            return LoadingWidget();
+          }
+        },
+      );
     }
   }
 }
 
-ChangeNotifierHighFive _changeNotifierHighFive = new ChangeNotifierHighFive();
+ChangeNotifierHighFive changeNotifierHighFive = new ChangeNotifierHighFive();
 
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {}
-
-Future<void> handleHighFiveMessage(BuildContext context, RemoteMessage message) async {
-  return handleHighFiveData(context, parseHighFiveData(message.data, message.data['id']));
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  var highFiveData = parseHighFiveData(message.data);
+  changeNotifierHighFive.add(highFiveData);
+  return insertReceivedHighFive(highFiveData);
 }
 
 Future<void> handleHighFiveData(BuildContext context, HighFiveData highFiveData) async {
+  acknowledge(highFiveData.documentId);
   List<HighFive> highfives = await getHighFives();
   String contact = await getContacts().then((contacts) => findContact(contacts, highFiveData.sender).displayName);
   Navigator.of(context).push(new HighFiveRoute(
-      highfives.firstWhere((highfive) => highfive.id.toString() == highFiveData.highfiveId), highFiveData.comment, contact));
-  FirebaseFirestore.instance.collection('highfives').doc(highFiveData.documentId).update({
-    'to': FieldValue.arrayRemove([FirebaseAuth.instance.currentUser.phoneNumber]),
-  });
+      highfives.firstWhere((highfive) => highfive.id == highFiveData.highfiveId), highFiveData.comment, contact));
 }
 
 Contact findContact(Iterable<Contact> contacts, String senderPhone) {

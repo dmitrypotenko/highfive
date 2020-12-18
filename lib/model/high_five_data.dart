@@ -1,9 +1,10 @@
 class HighFiveData {
   String sender;
-  String highfiveId;
+  int highfiveId;
   String comment;
   int timestamp;
   String documentId;
+  bool acknowledged;
 
-  HighFiveData(this.sender, this.highfiveId, this.comment, this.timestamp);
+  HighFiveData(this.sender, this.highfiveId, this.comment, this.timestamp, this.documentId);
 }
