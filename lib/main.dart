@@ -46,6 +46,7 @@ class _AppState extends State<App> with WidgetsBindingObserver {
   User _user = null;
   bool listening = false;
   Future<List<HighFiveData>> _highfives;
+  FutureBuilder<List<HighFiveData>> highFiveHistoryList;
 
   Database db;
 
@@ -70,13 +71,17 @@ class _AppState extends State<App> with WidgetsBindingObserver {
     initializeFlutterFire();
     askForPermissions();
     _highfives = readHighFives();
+    WidgetsBinding.instance.addObserver(this);
     super.initState();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      changeNotifierHighFive.notifyListeners();
+      readHighFives().then((value) {
+        _changeNotifierHighFive.highFives = value;
+        _changeNotifierHighFive.notifyListeners();
+      });
     }
   }
 
@@ -116,29 +121,33 @@ class _AppState extends State<App> with WidgetsBindingObserver {
       });
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         var highFiveData = parseHighFiveData(message.data);
-        changeNotifierHighFive.add(highFiveData);
+        _changeNotifierHighFive.add(highFiveData);
         insertReceivedHighFive(highFiveData);
         Vibration.vibrate(duration: 300);
         if (message.notification != null) {
           showSimpleNotification(
-            GestureDetector(
-              child: new Text("Вам прислали пятюню!"),
-              onTap: () async {
-                handleHighFiveData(context, highFiveData);
-              },
-            ),
-            duration: new Duration(seconds: 5),
-            trailing: Builder(builder: (context) {
-              return ElevatedButton(
-                  onPressed: () {
+            Builder(builder: (context) {
+              return GestureDetector(
+                key: new UniqueKey(),
+                child: new Container(
+                  child: new Text(
+                    "Вам прислали пятюню!",
+                    style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  ),
+                  height: 50,
+                ),
+                onTap: () async {
+                  handleHighFiveData(context, highFiveData);
+                },
+                onVerticalDragEnd: (details) {
+                  if (details.primaryVelocity < 0) {
                     OverlaySupportEntry.of(context).dismiss();
-                  },
-                  style: new ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.white)),
-                  child: Text(
-                    'Ага',
-                    style: new TextStyle(color: Colors.black),
-                  ));
+                  }
+                },
+              );
             }),
+            duration: new Duration(seconds: 5),
+            key: new UniqueKey(),
           );
         }
       });
@@ -166,13 +175,13 @@ class _AppState extends State<App> with WidgetsBindingObserver {
     if (_user == null) {
       return SetPhoneNumberWidget();
     } else {
-      return new FutureBuilder<List<HighFiveData>>(
+      highFiveHistoryList = new FutureBuilder<List<HighFiveData>>(
         future: _highfives,
         builder: (BuildContext context, AsyncSnapshot<List<HighFiveData>> snapshot) {
           if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
-            changeNotifierHighFive.highFives = snapshot.data;
+            _changeNotifierHighFive.highFives = snapshot.data;
             return new ChangeNotifierProvider(
-              create: (context) => changeNotifierHighFive,
+              create: (context) => _changeNotifierHighFive,
               child: new HighFiveHistory(),
             );
           } else {
@@ -180,15 +189,15 @@ class _AppState extends State<App> with WidgetsBindingObserver {
           }
         },
       );
+      return highFiveHistoryList;
     }
   }
 }
 
-ChangeNotifierHighFive changeNotifierHighFive = new ChangeNotifierHighFive();
+ChangeNotifierHighFive _changeNotifierHighFive = new ChangeNotifierHighFive();
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   var highFiveData = parseHighFiveData(message.data);
-  changeNotifierHighFive.add(highFiveData);
   return insertReceivedHighFive(highFiveData);
 }
 
@@ -199,8 +208,8 @@ Future<void> handleHighFiveData(BuildContext context, HighFiveData highFiveData)
   }
   List<HighFive> highfives = await getHighFives();
   String contact = await getContacts().then((contacts) => findContact(contacts, highFiveData.sender).displayName);
-  Navigator.of(context)
-      .push(new HighFiveRoute(highfives.firstWhere((highfive) => highfive.id == highFiveData.highfiveId), highFiveData.comment, contact));
+  Navigator.of(context).push(_createRoute(
+      highfives.firstWhere((highfive) => highfive.id == highFiveData.highfiveId), highFiveData.comment, contact, highFiveData.documentId));
 }
 
 Contact findContact(Iterable<Contact> contacts, String senderPhone) {
@@ -216,4 +225,14 @@ Future<Iterable<Contact>> getContacts() async {
   }
 
   return contacts;
+}
+
+Route _createRoute(HighFive highFive, String comment, String contact, String docId) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => new HighFiveWidget(highFive, comment, contact, docId),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      return child;
+    },
+    transitionDuration: new Duration(milliseconds: 500),
+  );
 }

@@ -55,6 +55,10 @@ Future<int> acknowledge(String id) async {
   return await db.update(highfiveTable, {acknowledged: 1});
 }
 
+Future<void> deleteRow(String docId) async {
+  return await db.delete(highfiveTable, where: '$id = ?', whereArgs: [docId]);
+}
+
 Future<List<HighFiveData>> readHighFives() {
   return getDb()
       .then((db) => db.rawQuery('SELECT hf.*, p.$phoneNumber FROM $highfiveTable as hf inner join $phoneTable as p on hf.$senderId=p.$id'))

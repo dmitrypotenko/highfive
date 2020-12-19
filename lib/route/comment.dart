@@ -14,11 +14,13 @@ class CommentRoute extends MaterialPageRoute {
           return new Scaffold(
             body: SafeArea(
               child: new Container(
+                padding: EdgeInsets.symmetric(horizontal: 30),
+                decoration: new BoxDecoration(boxShadow: [new BoxShadow(color: Colors.grey)], color: Colors.white),
                 alignment: Alignment.center,
                 child: Form(
                   key: _formKey,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       TextFormField(
                         controller: controller,

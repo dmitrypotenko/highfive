@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:highfive/firebase/loading.dart';
 import 'package:highfive/model/high_five.dart';
-
-import 'file:///C:/Users/Dzmitry_Potenko/AndroidStudioProjects/highfive/lib/route/contacts.dart';
+import 'package:highfive/route/contacts.dart';
+import 'package:highfive/util/util.dart';
 
 class HighFiveList extends MaterialPageRoute {
   HighFiveList()
@@ -13,24 +13,49 @@ class HighFiveList extends MaterialPageRoute {
               future: getHighFives(),
               builder: (BuildContext context, AsyncSnapshot<List<HighFive>> snapshot) {
                 if (snapshot.hasData) {
+                  var randomColors = getRandomColors(snapshot.data.length);
                   return new Scaffold(
                     body: SafeArea(
-                      child: new Container(
-                        child: new Column(
-                          children: snapshot.data
-                              .map(
-                                (highfive) => new InkWell(
-                                  onTap: () => Navigator.of(context).push(new ContactsRoute(highfive)),
-                                  child: new Container(
-                                    child: new Column(
-                                      children: [new Image(image: new AssetImage(highfive.imageUrl)), new Text(highfive.name)],
-                                    ),
+                      child: ListView.builder(
+                          padding: EdgeInsets.symmetric(vertical: 22),
+                          physics: new BouncingScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            if (index >= snapshot.data.length) {
+                              return null;
+                            } else {
+                              return new InkWell(
+                                onTap: () => Navigator.of(context).push(new ContactsRoute(snapshot.data[index])),
+                                child: new Container(
+                                  decoration: BoxDecoration(
+                                      color: randomColors[index],
+                                      borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: randomColors[index].withOpacity(0.5),
+                                          spreadRadius: 5,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 3), // changes position of shadow
+                                        ),
+                                      ]),
+                                  child: new Column(
+                                    children: [
+                                      new Image(image: new AssetImage(snapshot.data[index].imageUrl)),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.black.withOpacity(0.7),
+                                          borderRadius: BorderRadius.all(Radius.circular(20.0)),),
+                                        child: new Text(
+                                          snapshot.data[index].name,
+                                          style: new TextStyle(color: Colors.white, fontSize: 20),
+                                        ),
+                                      )
+                                    ],
                                   ),
+                                  margin: EdgeInsets.all(20),
                                 ),
-                              )
-                              .toList(),
-                        ),
-                      ),
+                              );
+                            }
+                          }),
                     ),
                   );
                 } else {
@@ -41,5 +66,8 @@ class HighFiveList extends MaterialPageRoute {
 }
 
 Future<List<HighFive>> getHighFives() {
-  return new Future<List<HighFive>>(() => [new HighFive("обычная пацанская пятюня", "assets/highfive.jpg", 1, "обычную пацанскую пятюню")]);
+  return new Future<List<HighFive>>(() => [
+        new HighFive("Стандартная пятюня", "assets/highfive.png", 1, "стандартную пятюню"),
+        new HighFive("Подлая пятюня по попе", "assets/slap-ass.png", 2, "подлую пятюню по попе")
+      ]);
 }

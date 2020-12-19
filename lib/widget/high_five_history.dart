@@ -2,13 +2,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:highfive/main.dart';
 import 'package:highfive/model/change_notifier_highfive.dart';
+import 'package:highfive/model/high_five.dart';
 import 'package:highfive/model/high_five_data.dart';
+import 'package:highfive/repository/repository.dart';
 import 'package:highfive/widget/high_five_list.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class HighFiveHistory extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final DateFormat formatter = DateFormat('yyyy-MM-dd hh:mm:ss');
     var highFivesModel = context.watch<ChangeNotifierHighFive>();
     Widget child = new Text('У вас нет непросмотренных пятюнь');
     if (highFivesModel.highFives.length > 0) {
@@ -16,11 +20,37 @@ class HighFiveHistory extends StatelessWidget {
         children: ListTile.divideTiles(
           context: context,
           tiles: highFivesModel.highFives.map(
-            (highfive) => new InkWell(
+            (highfive) => Dismissible(
+              onDismissed: (direction) {
+                deleteRow(highfive.documentId);
+                highFivesModel.highFives.remove(highfive);
+                highFivesModel.notifyListeners();
+              },
+              background: Container(color: Colors.red),
+              key: Key(highfive.documentId),
               child: new ListTile(
-                leading: Icon(
-                  Icons.arrow_back,
-                  color: Colors.green,
+                onTap: () async {
+                  handleHighFiveData(context, highfive);
+                },
+                tileColor: Theme.of(context).cardColor,
+                leading: FutureBuilder(
+                  future: getHighFives(),
+                  builder: (BuildContext context, AsyncSnapshot<List<HighFive>> snapshot) {
+                    if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
+                      return new Hero(
+                        child: Image.asset(
+                          snapshot.data.firstWhere((element) => element.id == highfive.highfiveId).imageUrl,
+                          width: 30,
+                          height: 30,
+                        ),
+                        tag: highfive.documentId + 'highfivepic',
+                      );
+                    }
+                    return Icon(
+                      Icons.data_usage,
+                      color: Colors.blue,
+                    );
+                  },
                 ),
                 title: new FutureBuilder<String>(
                   future: getContacts().then((contacts) => findContact(contacts, highfive.sender).displayName),
@@ -31,11 +61,8 @@ class HighFiveHistory extends StatelessWidget {
                     return buildRichText(highfive, highfive.sender);
                   },
                 ),
-                trailing: new Text(DateTime.fromMillisecondsSinceEpoch(highfive.timestamp * 1000).toString()),
+                trailing: new Text(formatter.format(DateTime.fromMillisecondsSinceEpoch(highfive.timestamp))),
               ),
-              onTap: () async {
-                handleHighFiveData(context, highfive);
-              },
             ),
           ),
         ).toList(),
@@ -66,6 +93,8 @@ class HighFiveHistory extends StatelessWidget {
   }
 }
 
+
+
 class SenderRichText extends StatelessWidget {
   String text;
 
@@ -73,21 +102,19 @@ class SenderRichText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new Consumer<bool>(builder: (context, acknowledged, child) {
-      var icon = acknowledged
+    return new Consumer<ValueNotifier<bool>>(builder: (context, valueNotifier, child) {
+      var icon = valueNotifier.value
           ? null
           : new Icon(
-        Icons.fiber_new_outlined,
-        color: Colors.deepPurpleAccent,
-        size: 30,
-      );
+              Icons.fiber_new_outlined,
+              color: Colors.deepPurpleAccent,
+              size: 30,
+            );
       return new RichText(
           text: new TextSpan(
               children: [new TextSpan(text: text), if (icon != null) WidgetSpan(child: icon)],
               style: new TextStyle(color: Colors.black, fontSize: 20)));
     });
-
-
   }
 }
 

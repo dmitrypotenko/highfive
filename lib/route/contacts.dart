@@ -25,6 +25,7 @@ class ContactsWidgetState extends State<ContactsWidget> {
 
   void refresh() {
     setState(() {
+      contacts = null;
       refreshContactsFuture = _refreshContacts();
     });
   }

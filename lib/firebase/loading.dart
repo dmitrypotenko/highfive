@@ -11,8 +11,12 @@ class LoadingWidget extends StatelessWidget {
         child: new Column(
           children: [
             new Image.asset("assets/highfive.gif"),
-            new Text("Подгрузочка")
+            new Text(
+              "Подгрузочка...",
+              style: new TextStyle(fontSize: 26),
+            )
           ],
+          mainAxisAlignment: MainAxisAlignment.center,
         ),
       ),
     );

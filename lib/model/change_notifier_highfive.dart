@@ -18,4 +18,12 @@ class ChangeNotifierHighFive extends ChangeNotifier {
   void addSilently(HighFiveData newHighFive) {
     _highFives.add(newHighFive);
   }
+
+  ChangeNotifierHighFive._privateConstructor();
+
+  static final ChangeNotifierHighFive _instance = ChangeNotifierHighFive._privateConstructor();
+
+  factory ChangeNotifierHighFive() {
+    return _instance;
+  }
 }
