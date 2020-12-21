@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:highfive/firebase/loading.dart';
 import 'package:highfive/model/high_five.dart';
+import 'package:highfive/model/high_fives_holder.dart';
 import 'package:highfive/route/contacts.dart';
 import 'package:highfive/util/util.dart';
 
@@ -13,7 +14,6 @@ class HighFiveList extends MaterialPageRoute {
               future: getHighFives(),
               builder: (BuildContext context, AsyncSnapshot<List<HighFive>> snapshot) {
                 if (snapshot.hasData) {
-                  var randomColors = getRandomColors(snapshot.data.length);
                   return new Scaffold(
                     body: SafeArea(
                       child: ListView.builder(
@@ -27,11 +27,11 @@ class HighFiveList extends MaterialPageRoute {
                                 onTap: () => Navigator.of(context).push(new ContactsRoute(snapshot.data[index])),
                                 child: new Container(
                                   decoration: BoxDecoration(
-                                      color: randomColors[index],
+                                      color: getColor(index),
                                       borderRadius: BorderRadius.all(Radius.circular(20.0)),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: randomColors[index].withOpacity(0.5),
+                                          color: getColor(index).withOpacity(0.5),
                                           spreadRadius: 5,
                                           blurRadius: 7,
                                           offset: Offset(0, 3), // changes position of shadow
@@ -43,7 +43,8 @@ class HighFiveList extends MaterialPageRoute {
                                       Container(
                                         decoration: BoxDecoration(
                                           color: Colors.black.withOpacity(0.7),
-                                          borderRadius: BorderRadius.all(Radius.circular(20.0)),),
+                                          borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                                        ),
                                         child: new Text(
                                           snapshot.data[index].name,
                                           style: new TextStyle(color: Colors.white, fontSize: 20),
@@ -66,8 +67,5 @@ class HighFiveList extends MaterialPageRoute {
 }
 
 Future<List<HighFive>> getHighFives() {
-  return new Future<List<HighFive>>(() => [
-        new HighFive("Стандартная пятюня", "assets/highfive.png", 1, "стандартную пятюню"),
-        new HighFive("Подлая пятюня по попе", "assets/slap-ass.png", 2, "подлую пятюню по попе")
-      ]);
+  return new HighFivesHolder().highFives;
 }

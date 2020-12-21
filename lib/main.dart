@@ -3,8 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:highfive/error/error.dart';
 import 'package:highfive/firebase/loading.dart';
+import 'package:highfive/model/contacts_holder.dart';
 import 'package:highfive/model/high_five.dart';
 import 'package:highfive/model/high_five_data.dart';
 import 'package:highfive/repository/repository.dart';
@@ -80,7 +82,6 @@ class _AppState extends State<App> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       readHighFives().then((value) {
         _changeNotifierHighFive.highFives = value;
-        _changeNotifierHighFive.notifyListeners();
       });
     }
   }
@@ -207,7 +208,7 @@ Future<void> handleHighFiveData(BuildContext context, HighFiveData highFiveData)
     highFiveData.acknowledged = true;
   }
   List<HighFive> highfives = await getHighFives();
-  String contact = await getContacts().then((contacts) => findContact(contacts, highFiveData.sender).displayName);
+  String contact = await new ContactsHolder().getContacts().then((contacts) => findContact(contacts, highFiveData.sender).displayName);
   Navigator.of(context).push(_createRoute(
       highfives.firstWhere((highfive) => highfive.id == highFiveData.highfiveId), highFiveData.comment, contact, highFiveData.documentId));
 }
@@ -215,16 +216,6 @@ Future<void> handleHighFiveData(BuildContext context, HighFiveData highFiveData)
 Contact findContact(Iterable<Contact> contacts, String senderPhone) {
   return contacts.firstWhere((contact) => contact.phones.map((e) => e.value).contains(senderPhone),
       orElse: () => new Contact(displayName: senderPhone));
-}
-
-Future<Iterable<Contact>> contacts;
-
-Future<Iterable<Contact>> getContacts() async {
-  if (contacts == null) {
-    contacts = ContactsService.getContacts(withThumbnails: false);
-  }
-
-  return contacts;
 }
 
 Route _createRoute(HighFive highFive, String comment, String contact, String docId) {

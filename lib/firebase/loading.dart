@@ -28,7 +28,7 @@ Future<void> saveTokenToDatabase(String token) async {
   // Assume user is logged in for this example
   String phoneNumber = FirebaseAuth.instance.currentUser.phoneNumber;
 
-  await FirebaseFirestore.instance.collection('users').doc(phoneNumber).update({
+  await FirebaseFirestore.instance.collection('users').doc(phoneNumber).set({
     'tokens': FieldValue.arrayUnion([token]),
   });
 }

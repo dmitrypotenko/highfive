@@ -2,11 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:highfive/firebase/loading.dart';
+import 'package:highfive/model/contacts_holder.dart';
 import 'package:highfive/model/high_five.dart';
 import 'package:highfive/widget/contacts_list.dart';
 import 'package:provider/provider.dart';
-
-import '../main.dart';
 
 class ContactsRoute extends MaterialPageRoute {
   ContactsRoute(HighFive highFive)
@@ -25,7 +24,7 @@ class ContactsWidgetState extends State<ContactsWidget> {
 
   void refresh() {
     setState(() {
-      contacts = null;
+      new ContactsHolder().invalidate();
       refreshContactsFuture = _refreshContacts();
     });
   }
@@ -68,7 +67,7 @@ class ContactsWidgetState extends State<ContactsWidget> {
   }
 
   Future<List<Contact>> _refreshContacts() async {
-    return getContacts().then((contacts) async {
+    return new ContactsHolder().getContacts().then((contacts) async {
       var localPhones =
           contacts.map((contact) => contact.phones.map((phone) => phone.value).toList(growable: true)).reduce((value, element) {
         value.addAll(element);

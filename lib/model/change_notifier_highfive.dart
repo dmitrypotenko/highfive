@@ -8,6 +8,7 @@ class ChangeNotifierHighFive extends ChangeNotifier {
 
   set highFives(List<HighFiveData> value) {
     _highFives = value;
+    notifyListeners();
   }
 
   void add(HighFiveData newHighFive) {
