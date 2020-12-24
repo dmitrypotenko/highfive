@@ -49,6 +49,7 @@ class _AppState extends State<App> with WidgetsBindingObserver {
   bool listening = false;
   Future<List<HighFiveData>> _highfives;
   FutureBuilder<List<HighFiveData>> highFiveHistoryList;
+  String _verificationId;
 
   Database db;
 
@@ -57,6 +58,12 @@ class _AppState extends State<App> with WidgetsBindingObserver {
     try {
       // Wait for Firebase to initialize and set `_initialized` state to true
       await Firebase.initializeApp();
+      FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+        alert: true, // Required to display a heads up notification
+        badge: true,
+        sound: true,
+      );
+      FirebaseMessaging.instance.onTokenRefresh.listen(saveTokenToDatabase);
       setState(() {
         _initialized = true;
       });
@@ -113,9 +120,7 @@ class _AppState extends State<App> with WidgetsBindingObserver {
           handleHighFiveData(context, highFiveData);
         }
       });
-
       FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
         var highFiveData = parseHighFiveData(message.data);
         handleHighFiveData(context, highFiveData);
@@ -152,13 +157,6 @@ class _AppState extends State<App> with WidgetsBindingObserver {
           );
         }
       });
-      FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-        alert: true, // Required to display a heads up notification
-        badge: true,
-        sound: true,
-      );
-      FirebaseMessaging.instance.getToken().then(saveTokenToDatabase);
-      FirebaseMessaging.instance.onTokenRefresh.listen(saveTokenToDatabase);
       listening = true;
       FirebaseAuth.instance.authStateChanges().listen((User user) {
         print('User state changed AppWidget');
@@ -167,14 +165,19 @@ class _AppState extends State<App> with WidgetsBindingObserver {
             this._user = null;
           });
         } else {
+          FirebaseMessaging.instance.getToken().then(saveTokenToDatabase);
           setState(() {
             this._user = user;
           });
         }
       });
     }
-    if (_user == null) {
-      return SetPhoneNumberWidget();
+    if (_user == null && _verificationId == null) {
+      return SetPhoneNumberWidget((smsSent) => setState(() {
+            this._verificationId = smsSent;
+          }));
+    } else if (_verificationId != null && _user == null) {
+      return SmsRoute(_verificationId);
     } else {
       highFiveHistoryList = new FutureBuilder<List<HighFiveData>>(
         future: _highfives,

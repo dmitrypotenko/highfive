@@ -26,9 +26,10 @@ class LoadingWidget extends StatelessWidget {
 Future<void> saveTokenToDatabase(String token) async {
   print('Saving new token to database');
   // Assume user is logged in for this example
-  String phoneNumber = FirebaseAuth.instance.currentUser.phoneNumber;
-
-  await FirebaseFirestore.instance.collection('users').doc(phoneNumber).set({
-    'tokens': FieldValue.arrayUnion([token]),
-  });
+  String phoneNumber = FirebaseAuth.instance.currentUser?.phoneNumber;
+  if (phoneNumber != null) {
+    await FirebaseFirestore.instance.collection('users').doc(phoneNumber).set({
+      'tokens': FieldValue.arrayUnion([token]),
+    });
+  }
 }
