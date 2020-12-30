@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:contacts_service/contacts_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -14,6 +16,7 @@ import 'package:highfive/route/high_five_route.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:sentry_flutter/sentry_flutter.dart' as Sentry;
 import 'package:sqflite/sqflite.dart';
 import 'package:vibration/vibration.dart';
 
@@ -24,17 +27,41 @@ import 'widget/high_five_list.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(
-    new OverlaySupport(
-      child: MaterialApp(
-        home: new App(),
-        theme: ThemeData(
-          primaryColor: Colors.white,
-        ),
-        title: 'Пятюня app',
-      ),
-    ),
+  await Sentry.SentryFlutter.init(
+    (options) => options.dsn = 'https://a5ad20b8cd2d4d289ab851898389133e@o497715.ingest.sentry.io/5574163',
+    appRunner: () => runZonedApp(),
   );
+}
+
+runZonedApp() {
+  // This captures errors reported by the Flutter framework.
+  FlutterError.onError = (FlutterErrorDetails details) {
+    if (isInDebugMode) {
+      // In development mode, simply print to console.
+      FlutterError.dumpErrorToConsole(details);
+    } else {
+      // In production mode, report to the application zone to report to
+      // Sentry.
+      Zone.current.handleUncaughtError(details.exception, details.stack);
+    }
+  };
+  runZonedGuarded<Future<void>>(() async {
+    runApp(
+      new OverlaySupport(
+        child: MaterialApp(
+          home: new App(),
+          theme: ThemeData(
+            primaryColor: Colors.white,
+          ),
+          title: 'Пятюня app',
+        ),
+      ),
+    );
+  }, (Object error, StackTrace stackTrace) {
+    // Whenever an error occurs, call the `_reportError` function. This sends
+    // Dart errors to the dev console or Sentry depending on the environment.
+    reportError(error, stackTrace);
+  });
 }
 
 class App extends StatefulWidget {
@@ -58,6 +85,7 @@ class _AppState extends State<App> with WidgetsBindingObserver {
     try {
       // Wait for Firebase to initialize and set `_initialized` state to true
       await Firebase.initializeApp();
+
       FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
         alert: true, // Required to display a heads up notification
         badge: true,
@@ -87,8 +115,8 @@ class _AppState extends State<App> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      readHighFives().then((value) {
-        _changeNotifierHighFive.highFives = value;
+      readHighFives().then((readHighFives) {
+        _changeNotifierHighFive.highFives = readHighFives;
       });
     }
   }
@@ -217,7 +245,7 @@ Future<void> handleHighFiveData(BuildContext context, HighFiveData highFiveData)
 }
 
 Contact findContact(Iterable<Contact> contacts, String senderPhone) {
-  return contacts.firstWhere((contact) => contact.phones.map((e) => e.value).contains(senderPhone),
+  return contacts.firstWhere((contact) => contact.phones.map((phone) => phone.value).contains(senderPhone),
       orElse: () => new Contact(displayName: senderPhone));
 }
 

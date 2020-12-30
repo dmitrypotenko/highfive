@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
+import 'package:highfive/error/error.dart';
 import 'package:highfive/firebase/loading.dart';
 import 'package:highfive/model/contacts_holder.dart';
 import 'package:highfive/model/high_five.dart';
@@ -58,11 +59,16 @@ class ContactsWidgetState extends State<ContactsWidget> {
   Future<List<String>> _getStoredPhones(List<String> phones) async {
     return FirebaseFirestore.instance
         .collection('users')
-        //  .where(FieldPath.documentId, whereIn: phones)  не работает why?
+        //  .where(FieldPath.documentId, whereIn: phones)  не работает why? TODO пофиксать!!!
         .get()
         .then((query) => query.docs)
         .then((documents) {
       return documents.map((doc) => doc.id).toList();
+    }).then((storedUsers) {
+      if (storedUsers.length == 0) {
+        reportErrorMessage("Found no stored users for local phones - $phones");
+      }
+      return storedUsers;
     });
   }
 

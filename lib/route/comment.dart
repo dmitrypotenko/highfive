@@ -43,5 +43,5 @@ class CommentRoute extends MaterialPageRoute {
               ),
             ),
           );
-        }) {}
+        });
 }

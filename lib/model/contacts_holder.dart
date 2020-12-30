@@ -1,4 +1,5 @@
 import 'package:contacts_service/contacts_service.dart';
+import 'package:highfive/error/error.dart';
 
 class ContactsHolder {
   Future<Iterable<Contact>> _contacts;
@@ -6,10 +7,15 @@ class ContactsHolder {
 
   Future<Iterable<Contact>> getContacts() async {
     if (_contacts == null) {
-      _contacts = ContactsService.getContacts(withThumbnails: false);
-      _phoneToContactMap = _contacts.then((value) =>
-          value.map((e) => Map.fromIterable(e.phones, key: (element) => element.value as String, value: (element) => e)).reduce((value,
-              element) {
+      _contacts = ContactsService.getContacts(withThumbnails: false).then((contacts) {
+        if (contacts.length == 0) {
+          reportErrorMessage("Local contacts are empty");
+        }
+        return contacts;
+      });
+      _phoneToContactMap = _contacts.then((contacts) => contacts
+              .map((contact) => Map.fromIterable(contact.phones, key: (phone) => phone.value as String, value: (phone) => contact))
+              .reduce((value, element) {
             value.addAll(element);
             return value;
           }));
@@ -17,7 +23,6 @@ class ContactsHolder {
 
     return _contacts;
   }
-
 
   Future<Map<String, Contact>> get phoneToContactMap => _phoneToContactMap;
 
