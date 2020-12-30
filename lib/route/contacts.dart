@@ -49,6 +49,10 @@ class ContactsWidgetState extends State<ContactsWidget> {
             ),
             body: ContactsListBody(snapshot.data),
           );
+        } else if (snapshot.hasError) {
+          var error = snapshot.error as Error;
+          reportError(error, error.stackTrace);
+          return CustomErrorWidget();
         } else {
           return LoadingWidget();
         }
@@ -56,7 +60,7 @@ class ContactsWidgetState extends State<ContactsWidget> {
     );
   }
 
-  Future<List<String>> _getStoredPhones(List<String> phones) async {
+  Future<List<String>> _getStoredPhones() async {
     return FirebaseFirestore.instance
         .collection('users')
         //  .where(FieldPath.documentId, whereIn: phones)  не работает why? TODO пофиксать!!!
@@ -66,7 +70,7 @@ class ContactsWidgetState extends State<ContactsWidget> {
       return documents.map((doc) => doc.id).toList();
     }).then((storedUsers) {
       if (storedUsers.length == 0) {
-        reportErrorMessage("Found no stored users for local phones - $phones");
+        reportErrorMessage("Found no stored users");
       }
       return storedUsers;
     });
@@ -74,16 +78,11 @@ class ContactsWidgetState extends State<ContactsWidget> {
 
   Future<List<Contact>> _refreshContacts() async {
     return new ContactsHolder().getContacts().then((contacts) async {
-      var localPhones =
-          contacts.map((contact) => contact.phones.map((phone) => phone.value).toList(growable: true)).reduce((value, element) {
-        value.addAll(element);
-        return value;
-      });
 
-      var storedPhones = await _getStoredPhones(localPhones);
+      var storedPhones = await _getStoredPhones();
       var contactsToSend = contacts
           .where((contact) =>
-              contact.phones.map((phone) => phone.value).toList(growable: true).any((element) => storedPhones.contains(element)))
+              contact.phones.map((phone) => normalizePhone(phone.value)).toList(growable: true).any((element) => storedPhones.contains(element)))
           .toList();
 
       if (contactsToSend == null) {
@@ -99,5 +98,6 @@ class ContactsWidgetState extends State<ContactsWidget> {
   @override
   void initState() {
     refreshContactsFuture = _refreshContacts();
+    super.initState();
   }
 }

@@ -14,7 +14,8 @@ class ContactsHolder {
         return contacts;
       });
       _phoneToContactMap = _contacts.then((contacts) => contacts
-              .map((contact) => Map.fromIterable(contact.phones, key: (phone) => phone.value as String, value: (phone) => contact))
+              .map((contact) =>
+                  Map.fromIterable(contact.phones, key: (phone) => normalizePhone(phone.value as String), value: (phone) => contact))
               .reduce((value, element) {
             value.addAll(element);
             return value;
@@ -39,4 +40,17 @@ class ContactsHolder {
   factory ContactsHolder() {
     return _instance;
   }
+}
+
+List<String> getPhonesFromContacts(Iterable<Contact> contacts) {
+  return contacts
+      .map((contact) => contact.phones.map((phone) => phone.value).map((phone) => normalizePhone(phone)).toList(growable: true))
+      .reduce((value, phones) {
+    value.addAll(phones);
+    return value;
+  });
+}
+
+String normalizePhone(String phone) {
+  return phone.replaceAll(new RegExp('[-() ]+'), '');
 }

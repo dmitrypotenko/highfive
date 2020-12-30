@@ -245,7 +245,7 @@ Future<void> handleHighFiveData(BuildContext context, HighFiveData highFiveData)
 }
 
 Contact findContact(Iterable<Contact> contacts, String senderPhone) {
-  return contacts.firstWhere((contact) => contact.phones.map((phone) => phone.value).contains(senderPhone),
+  return contacts.firstWhere((contact) => contact.phones.map((phone) => normalizePhone(phone.value)).contains(senderPhone),
       orElse: () => new Contact(displayName: senderPhone));
 }
 

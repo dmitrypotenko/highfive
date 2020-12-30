@@ -8,7 +8,7 @@ class CustomErrorWidget extends StatelessWidget {
     return Scaffold(
       body: Container(
         alignment: Alignment.center,
-        child: new Text("Что пошло не так! Чекните подключение к интернету."),
+        child: new Text("Что пошло не так! Я уже потею, что решить вашу проблемку"),
       ),
     );
   }
