@@ -8,7 +8,6 @@ import 'package:highfive/error/error.dart';
 import 'package:http/http.dart';
 
 sendPush(List<Contact> contactsToSend, BuildContext context, String comment, String highfiveId) async {
-  reportErrorMessage("Somebody has sent a highfive");
   var data = new Map();
   data['to'] = contactsToSend
       .map((contact) => contact.phones.map((phone) => phone.value).toList(growable: true))
