@@ -37,17 +37,14 @@ class HighFiveHistory extends StatelessWidget {
                 tileColor: Theme.of(context).cardColor,
                 leading: FutureBuilder(
                   future: new HighFivesHolder().highFivesImageMap,
-                  builder: (BuildContext context, AsyncSnapshot<Map<int, Image>> snapshot) {
+                  builder: (BuildContext context, AsyncSnapshot<Map<int, HighFive>> snapshot) {
                     if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
                       return new Hero(
-                        child: snapshot.data[highfive.highfiveId],
+                        child: snapshot.data[highfive.highfiveId].getNetworkCachedImage(),
                         tag: highfive.documentId + 'highfivepic',
                       );
                     }
-                    return Icon(
-                      Icons.data_usage,
-                      color: Colors.blue,
-                    );
+                    return CircularProgressIndicator();
                   },
                 ),
                 title: new FutureBuilder<String>(

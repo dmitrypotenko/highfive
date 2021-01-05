@@ -4,10 +4,9 @@ import 'package:contacts_service/contacts_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:highfive/error/error.dart';
 import 'package:http/http.dart';
 
-sendPush(List<Contact> contactsToSend, BuildContext context, String comment, String highfiveId) async {
+sendPush(List<Contact> contactsToSend, BuildContext context, String comment, String highfiveId, String from) async {
   var data = new Map();
   data['to'] = contactsToSend
       .map((contact) => contact.phones.map((phone) => phone.value).toList(growable: true))
@@ -17,7 +16,7 @@ sendPush(List<Contact> contactsToSend, BuildContext context, String comment, Str
       })
       .toSet()
       .toList();
-  data['from'] = FirebaseAuth.instance.currentUser.phoneNumber;
+  data['from'] = from.isNotEmpty ? from : FirebaseAuth.instance.currentUser.phoneNumber;
   data['comment'] = comment;
   data['highfiveId'] = highfiveId;
 

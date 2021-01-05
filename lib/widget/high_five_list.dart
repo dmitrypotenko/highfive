@@ -39,7 +39,7 @@ class HighFiveList extends MaterialPageRoute {
                                       ]),
                                   child: new Column(
                                     children: [
-                                      new Image(image: new AssetImage(snapshot.data[index].imageUrl)),
+                                      snapshot.data[index].getNetworkCachedImage(),
                                       Container(
                                         decoration: BoxDecoration(
                                           color: Colors.black.withOpacity(0.7),

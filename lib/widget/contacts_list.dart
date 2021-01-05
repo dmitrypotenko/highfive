@@ -64,10 +64,10 @@ class ContactsListBodyState extends State<ContactsListBody> {
                                   ElevatedButton(
                                     child: const Text('Отправить пятюню'),
                                     onPressed: () async => await sendPush(
-                                        _contactsToSend, context, '', Provider.of<HighFive>(context, listen: false).id.toString()),
+                                        _contactsToSend, context, '', Provider.of<HighFive>(context, listen: false).id.toString(), ''),
                                   ),
                                   ElevatedButton(
-                                    child: const Text('Добавить комментарий'),
+                                    child: const Text('Добавить инфы'),
                                     onPressed: () => Navigator.of(context)
                                         .push(new CommentRoute(_contactsToSend, Provider.of<HighFive>(context, listen: false))),
                                   )

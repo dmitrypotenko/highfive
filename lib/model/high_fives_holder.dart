@@ -4,16 +4,15 @@ import 'high_five.dart';
 
 class HighFivesHolder {
   Future<List<HighFive>> highFives;
-  Future<Map<int, Image>> highFivesImageMap;
+  Future<Map<int, HighFive>> highFivesImageMap;
+  HighFiveContentfulRepository _repository;
 
   HighFivesHolder._privateConstructor() {
-    highFives = new Future<List<HighFive>>(() => [
-          new HighFive("Стандартная пятюня", "assets/highfive.png", 1, "стандартную пятюню"),
-          new HighFive("Подлая пятюня по попе", "assets/slap-ass.png", 2, "подлую пятюню по попе")
-        ]);
+    _repository = new HighFiveContentfulRepository();
+    highFives = _repository.getHighFives();
 
     highFivesImageMap = highFives.then((highFives) => Map.fromIterable(highFives,
-        key: (highFive) => highFive.id, value: (highFive) => Image.asset(highFive.imageUrl, width: 30, height: 30)));
+        key: (highFive) => highFive.id, value: (highFive) => highFive));
   }
 
   static final HighFivesHolder _instance = HighFivesHolder._privateConstructor();

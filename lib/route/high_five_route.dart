@@ -17,7 +17,7 @@ class HighFiveWidget extends StatelessWidget {
         child: new Container(
           child: Column(
             children: [
-              new Hero(child: Image.asset(highFive.imageUrl), tag: docId + 'highfivepic'),
+              new Hero(child: highFive.getNetworkCachedImage(), tag: docId + 'highfivepic'),
               new Container(
                 child: new RichText(
                   text: new TextSpan(
