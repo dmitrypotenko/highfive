@@ -39,7 +39,7 @@ class ContactsWidgetState extends State<ContactsWidget> {
         if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
           return new Scaffold(
             appBar: new AppBar(
-              title: new Text('Кому пятюня?'),
+              title: new Text('Кому послать?'),
               actions: [
                 new IconButton(
                   icon: Icon(Icons.refresh),

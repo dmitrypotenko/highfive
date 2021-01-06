@@ -36,11 +36,11 @@ class HighFiveHistory extends StatelessWidget {
                 },
                 tileColor: Theme.of(context).cardColor,
                 leading: FutureBuilder(
-                  future: new HighFivesHolder().highFivesImageMap,
-                  builder: (BuildContext context, AsyncSnapshot<Map<int, HighFive>> snapshot) {
+                  future: new HighFivesHolder().getById(highfive.highfiveId),
+                  builder: (BuildContext context, AsyncSnapshot<HighFive> snapshot) {
                     if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
                       return new Hero(
-                        child: snapshot.data[highfive.highfiveId].getNetworkCachedImage(),
+                        child: snapshot.data.getNetworkCachedImage(),
                         tag: highfive.documentId + 'highfivepic',
                       );
                     }
@@ -87,8 +87,6 @@ class HighFiveHistory extends StatelessWidget {
     );
   }
 }
-
-
 
 class SenderRichText extends StatelessWidget {
   String text;

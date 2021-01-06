@@ -11,6 +11,7 @@ import 'package:highfive/firebase/loading.dart';
 import 'package:highfive/model/contacts_holder.dart';
 import 'package:highfive/model/high_five.dart';
 import 'package:highfive/model/high_five_data.dart';
+import 'package:highfive/model/high_fives_holder.dart';
 import 'package:highfive/repository/repository.dart';
 import 'package:highfive/route/high_five_route.dart';
 import 'package:overlay_support/overlay_support.dart';
@@ -23,7 +24,6 @@ import 'package:vibration/vibration.dart';
 import 'login/login.dart';
 import 'model/change_notifier_highfive.dart';
 import 'widget/high_five_history.dart';
-import 'widget/high_five_list.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -238,10 +238,9 @@ Future<void> handleHighFiveData(BuildContext context, HighFiveData highFiveData)
     acknowledge(highFiveData.documentId);
     highFiveData.acknowledged = true;
   }
-  List<HighFive> highfives = await getHighFives();
   String contact = await new ContactsHolder().getContacts().then((contacts) => findContact(contacts, highFiveData.sender).displayName);
-  Navigator.of(context).push(_createRoute(
-      highfives.firstWhere((highfive) => highfive.id == highFiveData.highfiveId), highFiveData.comment, contact, highFiveData.documentId));
+  var highFive = await new HighFivesHolder().getById(highFiveData.highfiveId);
+  Navigator.of(context).push(_createRoute(highFive, highFiveData.comment, contact, highFiveData.documentId));
 }
 
 Contact findContact(Iterable<Contact> contacts, String senderPhone) {
