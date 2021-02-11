@@ -3,6 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 class CustomErrorWidget extends StatelessWidget {
+
+  CustomErrorWidget(Error error) {
+    reportError(error, error.stackTrace);
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
