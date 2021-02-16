@@ -1,11 +1,15 @@
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:highfive/firebase/functions.dart';
+import 'package:highfive/firebase/firebase_functions_bloc.dart';
+import 'package:highfive/firebase/firebase_functions_repository.dart';
+import 'package:highfive/locator/locator.dart';
 import 'package:highfive/model/high_five.dart';
 import 'package:highfive/route/comment.dart';
+import 'package:highfive/route/navigation.dart';
 import 'package:provider/provider.dart';
 
+import 'highfive_send.dart';
 
 class ContactsListBody extends StatefulWidget {
   List<Contact> _contacts;
@@ -61,15 +65,12 @@ class ContactsListBodyState extends State<ContactsListBody> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 mainAxisSize: MainAxisSize.min,
                                 children: <Widget>[
-                                  ElevatedButton(
-                                    child: const Text('Отправить пятюню'),
-                                    onPressed: () async => await sendPush(
-                                        _contactsToSend, context, '', Provider.of<HighFive>(context, listen: false).id.toString(), ''),
-                                  ),
+                                  new HighFiveSend(locator.get<FirebaseFunctionsRepository>(), locator.get<NavigationService>(),
+                                      new SendHighFiveEvent(_contactsToSend, "", Provider.of<HighFive>(context, listen: false).id.toString(), "")),
                                   ElevatedButton(
                                     child: const Text('Добавить инфы'),
-                                    onPressed: () => Navigator.of(context)
-                                        .push(new CommentRoute(_contactsToSend, Provider.of<HighFive>(context, listen: false))),
+                                    onPressed: () =>
+                                        Navigator.of(context).push(new CommentRoute(_contactsToSend, Provider.of<HighFive>(context, listen: false))),
                                   )
                                 ],
                               ),

@@ -12,4 +12,8 @@ class NavigationService {
   void pop([Object arguments]) {
     navigationKey.currentState.pop(arguments);
   }
+
+  void popUntil(RoutePredicate predicate) {
+    navigationKey.currentState.popUntil(predicate);
+  }
 }
