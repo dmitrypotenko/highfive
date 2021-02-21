@@ -3,15 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:highfive/model/high_five.dart';
 
 class HighFiveWidget extends StatelessWidget {
-  HighFive highFive;
-  String comment;
-  String contact;
-  String docId;
+  final HighFive _highFive;
+  final String _comment;
+  final String _contact;
+  final String _documentId;
 
-  HighFiveWidget(this.highFive, this.comment, this.contact, this.docId);
+  HighFiveWidget(this._highFive, this._comment, this._contact, this._documentId);
 
   @override
   Widget build(BuildContext context) {
+    return buildScreen(_highFive, _comment, _contact, _documentId);
+  }
+
+  Widget buildScreen(HighFive highFive, String comment, String contact, String docId) {
     return new Scaffold(
       body: SafeArea(
         child: new Container(
@@ -31,7 +35,6 @@ class HighFiveWidget extends StatelessWidget {
                     ],
                     style: new TextStyle(color: Colors.black, fontSize: 20),
                   ),
-
                 ),
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 alignment: Alignment.center,

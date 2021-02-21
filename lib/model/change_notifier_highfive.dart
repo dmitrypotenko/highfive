@@ -16,6 +16,11 @@ class ChangeNotifierHighFive extends ChangeNotifier {
     notifyListeners();
   }
 
+  void remove(HighFiveData highFiveData) {
+    _highFives.remove(highFiveData);
+    notifyListeners();
+  }
+
   void addSilently(HighFiveData newHighFive) {
     _highFives.add(newHighFive);
   }

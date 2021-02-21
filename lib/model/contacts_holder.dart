@@ -25,6 +25,14 @@ class ContactsHolder {
     return _contacts;
   }
 
+  Contact findContact(Iterable<Contact> contacts, String senderPhone) {
+    return contacts.firstWhere(
+            (contact) => contact.phones
+            .map((phone) => normalizePhone(phone.value))
+            .contains(senderPhone),
+        orElse: () => new Contact(displayName: senderPhone));
+  }
+
   Future<Map<String, Contact>> get phoneToContactMap => _phoneToContactMap;
 
   ContactsHolder._privateConstructor() {

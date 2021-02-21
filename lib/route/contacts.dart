@@ -50,9 +50,7 @@ class ContactsWidgetState extends State<ContactsWidget> {
             body: ContactsListBody(snapshot.data),
           );
         } else if (snapshot.hasError) {
-          var error = snapshot.error as Error;
-          reportError(error, error.stackTrace);
-          return CustomErrorWidget();
+          return CustomErrorWidget(snapshot.error as Error);
         } else {
           return LoadingWidget();
         }

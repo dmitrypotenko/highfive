@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:contacts_service/contacts_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -8,12 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:highfive/error/error.dart';
 import 'package:highfive/firebase/loading.dart';
-import 'package:highfive/model/contacts_holder.dart';
-import 'package:highfive/model/high_five.dart';
+import 'package:highfive/locator/locator.dart';
 import 'package:highfive/model/high_five_data.dart';
-import 'package:highfive/model/high_fives_holder.dart';
 import 'package:highfive/repository/repository.dart';
-import 'package:highfive/route/high_five_route.dart';
+import 'package:highfive/route/highfive_route.dart';
+import 'package:highfive/route/navigation.dart';
+import 'package:highfive/widget/delete_consent.dart';
+import 'package:highfive/widget/high_five_widget.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -23,6 +23,8 @@ import 'package:vibration/vibration.dart';
 
 import 'login/login.dart';
 import 'model/change_notifier_highfive.dart';
+import 'model/contacts_holder.dart';
+import 'model/high_fives_holder.dart';
 import 'widget/high_five_history.dart';
 
 Future<void> main() async {
@@ -34,6 +36,8 @@ Future<void> main() async {
 }
 
 runZonedApp() {
+  GlobalKey<NavigatorState> key = GlobalKey();
+  setupLocator(key);
   // This captures errors reported by the Flutter framework.
   FlutterError.onError = (FlutterErrorDetails details) {
     if (isInDebugMode) {
@@ -49,11 +53,21 @@ runZonedApp() {
     runApp(
       new OverlaySupport(
         child: MaterialApp(
+          navigatorKey: key,
           home: new App(),
           theme: ThemeData(
             primaryColor: Colors.white,
           ),
+          routes: {
+            "delete-highfive": (context) => DeleteConsentWidget(),
+          },
           title: 'Пятюня app',
+          onGenerateRoute: (settings) {
+            if (settings.name == "highfive") {
+              return HighFiveRoute.createInstance(settings);
+            }
+            return null;
+          },
         ),
       ),
     );
@@ -132,7 +146,7 @@ class _AppState extends State<App> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     // Show error message if initialization failed
     if (_error) {
-      return CustomErrorWidget();
+      return CustomErrorWidget(Error());
     }
     // Show a loader until FlutterFire is initialized
     if (!_initialized) {
@@ -145,13 +159,13 @@ class _AppState extends State<App> with WidgetsBindingObserver {
       FirebaseMessaging.instance.getInitialMessage().then((message) {
         if (message != null) {
           var highFiveData = parseHighFiveData(message.data);
-          handleHighFiveData(context, highFiveData);
+          handleHighFiveData(highFiveData);
         }
       });
       FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
         var highFiveData = parseHighFiveData(message.data);
-        handleHighFiveData(context, highFiveData);
+        handleHighFiveData(highFiveData);
       });
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         var highFiveData = parseHighFiveData(message.data);
@@ -171,7 +185,7 @@ class _AppState extends State<App> with WidgetsBindingObserver {
                   height: 50,
                 ),
                 onTap: () async {
-                  handleHighFiveData(context, highFiveData);
+                  handleHighFiveData(highFiveData);
                 },
                 onVerticalDragEnd: (details) {
                   if (details.primaryVelocity < 0) {
@@ -233,27 +247,15 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   return insertReceivedHighFive(highFiveData);
 }
 
-Future<void> handleHighFiveData(BuildContext context, HighFiveData highFiveData) async {
+Future<void> handleHighFiveData(HighFiveData highFiveData) async {
   if (highFiveData.acknowledged == false) {
     acknowledge(highFiveData.documentId);
     highFiveData.acknowledged = true;
   }
-  String contact = await new ContactsHolder().getContacts().then((contacts) => findContact(contacts, highFiveData.sender).displayName);
+  var contactsHolder = new ContactsHolder();
+  String contact = await contactsHolder.getContacts().then((contacts) => contactsHolder.findContact(contacts, highFiveData.sender).displayName);
   var highFive = await new HighFivesHolder().getById(highFiveData.highfiveId);
-  Navigator.of(context).push(_createRoute(highFive, highFiveData.comment, contact, highFiveData.documentId));
-}
 
-Contact findContact(Iterable<Contact> contacts, String senderPhone) {
-  return contacts.firstWhere((contact) => contact.phones.map((phone) => normalizePhone(phone.value)).contains(senderPhone),
-      orElse: () => new Contact(displayName: senderPhone));
-}
-
-Route _createRoute(HighFive highFive, String comment, String contact, String docId) {
-  return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => new HighFiveWidget(highFive, comment, contact, docId),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      return child;
-    },
-    transitionDuration: new Duration(milliseconds: 500),
-  );
+  locator.get<NavigationService>().pushNamed("highfive",
+      arguments: {"documentId": highFiveData.documentId, "contact": contact, "highfiveModel": highFive, "comment": highFiveData.comment});
 }
