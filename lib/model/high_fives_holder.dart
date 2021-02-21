@@ -49,7 +49,7 @@ class HighFivesHolder {
           '',
           'https://images.ctfassets.net/4vb93gzyehi7/5L2BAKqRP6Q4ZNpnsfrEb4/63acf404dbdee6d61871b8076a0597f1/clipart2938578.png',
           0,
-          'нечто нами неведомое',
+          'нечто нам неведомое',
           Colors.blue.value);
     }
     return highFive;

@@ -1,7 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:highfive/firebase/functions.dart';
+import 'package:highfive/firebase/firebase_functions_bloc.dart';
+import 'package:highfive/firebase/firebase_functions_repository.dart';
+import 'package:highfive/locator/locator.dart';
 import 'package:highfive/model/high_five.dart';
+import 'package:highfive/route/navigation.dart';
+import 'package:highfive/widget/highfive_send.dart';
 
 class CommentRoute extends MaterialPageRoute {
   CommentRoute(_contactsToSend, HighFive highFive)
@@ -40,13 +44,11 @@ class CommentRoute extends MaterialPageRoute {
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 16.0),
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            await sendPush(_contactsToSend, context, commentController.value.text, highFive.id.toString(),
-                                senderNameController.value.text);
-                          },
-                          child: Text('Отправить пятюню'),
-                        ),
+                        child: new HighFiveSend(locator.get<FirebaseFunctionsRepository>(),
+                            locator.get<NavigationService>(),
+                            new SendHighFiveEvent(_contactsToSend,
+                                commentController.value.text,
+                                highFive.id.toString(), senderNameController.value.text)),
                       ),
                     ],
                   ),
@@ -56,3 +58,5 @@ class CommentRoute extends MaterialPageRoute {
           );
         });
 }
+/*sendPush(_contactsToSend, context, commentController.value.text, highFive.id.toString(),
+                                senderNameController.value.text);*/
