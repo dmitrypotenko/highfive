@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:highfive/firebase/firebase_functions_bloc.dart';
-import 'package:highfive/firebase/firebase_functions_repository.dart';
+import 'package:highfive/firebase/firebase_functions_service.dart';
 import 'package:highfive/locator/locator.dart';
 import 'package:highfive/model/high_five.dart';
 import 'package:highfive/route/navigation.dart';
@@ -44,7 +44,7 @@ class CommentRoute extends MaterialPageRoute {
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 16.0),
-                        child: new HighFiveSend(locator.get<FirebaseFunctionsRepository>(),
+                        child: new HighFiveSend(locator.get<FirebaseFunctionsService>(),
                             locator.get<NavigationService>(),
                             new SendHighFiveEvent(_contactsToSend,
                                 commentController.value.text,

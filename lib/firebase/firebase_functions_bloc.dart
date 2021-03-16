@@ -1,16 +1,16 @@
 import 'package:bloc/bloc.dart';
 import 'package:contacts_service/contacts_service.dart';
 
-import 'firebase_functions_repository.dart';
+import 'firebase_functions_service.dart';
 
 class FirebaseFunctionBloc extends Bloc<SendHighFiveEvent, SendHighFiveState> {
-  final FirebaseFunctionsRepository _firebaseFunctionsRepository;
+  final FirebaseFunctionsService _firebaseFunctionsService;
 
-  FirebaseFunctionBloc(this._firebaseFunctionsRepository) : super(SendHighFiveState(SendHighFiveStatus.unknown));
+  FirebaseFunctionBloc(this._firebaseFunctionsService) : super(SendHighFiveState(SendHighFiveStatus.unknown));
 
   @override
   Stream<SendHighFiveState> mapEventToState(SendHighFiveEvent event) async* {
-    SendHighFiveStatus status = await _firebaseFunctionsRepository.sendPush(event.contactsToSend, event.comment, event.highfiveId, event.from);
+    SendHighFiveStatus status = await _firebaseFunctionsService.sendPush(event.contactsToSend, event.comment, event.highfiveId, event.from);
 
     yield new SendHighFiveState(status);
   }
