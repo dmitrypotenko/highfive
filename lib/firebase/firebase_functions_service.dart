@@ -3,10 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:highfive/error/error.dart';
 import 'package:highfive/firebase/firebase_functions_client.dart';
 
-class FirebaseFunctionsRepository {
+class FirebaseFunctionsService {
   FirebaseFunctionClient _firebaseFunctionClient;
 
-  FirebaseFunctionsRepository(this._firebaseFunctionClient);
+  FirebaseFunctionsService(this._firebaseFunctionClient);
 
   Future<SendHighFiveStatus> sendPush(List<Contact> contactsToSend, String comment, String highfiveId, String from) async {
     var contactsToSendPhones = contactsToSend

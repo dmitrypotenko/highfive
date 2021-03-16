@@ -2,20 +2,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:highfive/firebase/firebase_functions_bloc.dart';
-import 'package:highfive/firebase/firebase_functions_repository.dart';
+import 'package:highfive/firebase/firebase_functions_service.dart';
 import 'package:highfive/route/navigation.dart';
 
 class HighFiveSend extends StatelessWidget {
-  final FirebaseFunctionsRepository _firebaseFunctionsRepository;
+  final FirebaseFunctionsService _firebaseFunctionsService;
   final NavigationService _navigationService;
   final SendHighFiveEvent _event;
 
-  HighFiveSend(this._firebaseFunctionsRepository, this._navigationService, this._event);
+  HighFiveSend(this._firebaseFunctionsService, this._navigationService, this._event);
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider<FirebaseFunctionBloc>(
-      create: (context) => new FirebaseFunctionBloc(_firebaseFunctionsRepository),
+      create: (context) => new FirebaseFunctionBloc(_firebaseFunctionsService),
       child: BlocListener<FirebaseFunctionBloc, SendHighFiveState>(
         listener: (context, state) {
           if (state.status == SendHighFiveStatus.success) {

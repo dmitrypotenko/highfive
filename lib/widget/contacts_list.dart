@@ -2,7 +2,7 @@ import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:highfive/firebase/firebase_functions_bloc.dart';
-import 'package:highfive/firebase/firebase_functions_repository.dart';
+import 'package:highfive/firebase/firebase_functions_service.dart';
 import 'package:highfive/locator/locator.dart';
 import 'package:highfive/model/high_five.dart';
 import 'package:highfive/route/comment.dart';
@@ -65,7 +65,7 @@ class ContactsListBodyState extends State<ContactsListBody> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 mainAxisSize: MainAxisSize.min,
                                 children: <Widget>[
-                                  new HighFiveSend(locator.get<FirebaseFunctionsRepository>(), locator.get<NavigationService>(),
+                                  new HighFiveSend(locator.get<FirebaseFunctionsService>(), locator.get<NavigationService>(),
                                       new SendHighFiveEvent(_contactsToSend, "", Provider.of<HighFive>(context, listen: false).id.toString(), "")),
                                   ElevatedButton(
                                     child: const Text('Добавить инфы'),

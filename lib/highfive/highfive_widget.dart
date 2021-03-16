@@ -2,13 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:highfive/model/high_five.dart';
 
-class HighFiveWidget extends StatelessWidget {
+class HighfiveWidget extends StatelessWidget {
   final HighFive _highFive;
   final String _comment;
   final String _contact;
   final String _documentId;
 
-  HighFiveWidget(this._highFive, this._comment, this._contact, this._documentId);
+  HighfiveWidget(this._highFive, this._comment, this._contact, this._documentId);
 
   @override
   Widget build(BuildContext context) {
