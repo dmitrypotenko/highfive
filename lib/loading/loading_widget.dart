@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'loading_widget.i18n.dart';
 
 class LoadingWidget extends StatelessWidget {
   @override
@@ -10,7 +11,7 @@ class LoadingWidget extends StatelessWidget {
           children: [
             new Image.asset("assets/highfive.gif"),
             new Text(
-              "Подгрузочка...",
+              "Подгрузочка...".i18n,
               style: new TextStyle(fontSize: 26),
             )
           ],
