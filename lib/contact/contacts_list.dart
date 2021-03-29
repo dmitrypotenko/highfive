@@ -1,15 +1,16 @@
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:highfive/firebase/firebase_functions_bloc.dart';
+import 'package:highfive/highfive/send/highfive_send_bloc.dart';
 import 'package:highfive/firebase/firebase_functions_service.dart';
 import 'package:highfive/locator/locator.dart';
-import 'package:highfive/model/high_five.dart';
-import 'package:highfive/route/comment.dart';
+import 'package:highfive/highfive/high_five_model.dart';
+import 'package:highfive/comment/comment_route.dart';
 import 'package:highfive/route/navigation.dart';
 import 'package:provider/provider.dart';
 
-import 'highfive_send.dart';
+import '../highfive/send/highfive_send_widget.dart';
+import 'contacts.i18n.dart';
 
 class ContactsListBody extends StatefulWidget {
   List<Contact> _contacts;
@@ -66,11 +67,11 @@ class ContactsListBodyState extends State<ContactsListBody> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: <Widget>[
                                   new HighFiveSend(locator.get<FirebaseFunctionsService>(), locator.get<NavigationService>(),
-                                      new SendHighFiveEvent(_contactsToSend, "", Provider.of<HighFive>(context, listen: false).id.toString(), "")),
+                                      new SendHighFiveEvent(_contactsToSend, "", Provider.of<HighFiveModel>(context, listen: false).id.toString(), "")),
                                   ElevatedButton(
-                                    child: const Text('Добавить инфы'),
+                                    child: Text('Добавить инфы'.i18n),
                                     onPressed: () =>
-                                        Navigator.of(context).push(new CommentRoute(_contactsToSend, Provider.of<HighFive>(context, listen: false))),
+                                        Navigator.of(context).push(new CommentRoute(_contactsToSend, Provider.of<HighFiveModel>(context, listen: false))),
                                   )
                                 ],
                               ),

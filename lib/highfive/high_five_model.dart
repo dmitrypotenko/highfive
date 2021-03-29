@@ -7,14 +7,14 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'high_five.g.dart';
 
-class HighFive {
+class HighFiveModel {
   final String name;
   final String nameFrom;
   final String imageUrl;
   final int id;
   final int color;
 
-  HighFive(this.name, this.imageUrl, this.id, this.nameFrom, this.color);
+  HighFiveModel(this.name, this.imageUrl, this.id, this.nameFrom, this.color);
 
   CachedNetworkImage getNetworkCachedImage() {
     return CachedNetworkImage(
@@ -63,10 +63,10 @@ class HighFiveContentfulFields extends Equatable {
 class HighFiveContentfulRepository {
   final Client contentful = Client('4vb93gzyehi7', '05Kp7MY8qJLLPt9NdvV_C5Oo32UFewVwhJSFXxTxmtE');
 
-  Future<List<HighFive>> getHighFives() async {
+  Future<List<HighFiveModel>> getHighFives() async {
     var entryCollection = await contentful.getEntries({'order': 'fields.id', 'content_type': 'hIghfive'}, HighFiveContentful.fromJson);
     return entryCollection.items
-        .map((highfiveContenful) => new HighFive(highfiveContenful.fields.name,
+        .map((highfiveContenful) => new HighFiveModel(highfiveContenful.fields.name,
             'https:' + highfiveContenful.fields.imageUrl.fields.file.url, highfiveContenful.fields.id, highfiveContenful.fields.nameFrom,
         highfiveContenful.fields.color))
         .toList(growable: true);

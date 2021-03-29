@@ -2,14 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:highfive/error/error.dart';
-import 'package:highfive/firebase/loading.dart';
-import 'package:highfive/model/contacts_holder.dart';
-import 'package:highfive/model/high_five.dart';
-import 'package:highfive/widget/contacts_list.dart';
+import 'package:highfive/loading/loading_widget.dart';
+import 'package:highfive/contact/contacts_holder.dart';
+import 'package:highfive/highfive/high_five_model.dart';
+import 'package:highfive/contact/contacts_list.dart';
 import 'package:provider/provider.dart';
+import 'contacts.i18n.dart';
 
 class ContactsRoute extends MaterialPageRoute {
-  ContactsRoute(HighFive highFive)
+  ContactsRoute(HighFiveModel highFive)
       : super(builder: (BuildContext context) {
           return Provider(create: (context) => highFive, child: ContactsWidget());
         }) {}
@@ -39,7 +40,7 @@ class ContactsWidgetState extends State<ContactsWidget> {
         if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
           return new Scaffold(
             appBar: new AppBar(
-              title: new Text('Кому послать?'),
+              title: new Text('Кому послать?'.i18n),
               actions: [
                 new IconButton(
                   icon: Icon(Icons.refresh),

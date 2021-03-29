@@ -3,23 +3,26 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:highfive/error/error.dart';
-import 'package:highfive/firebase/loading.dart';
-import 'package:highfive/highfive/highfive_list_widget.dart';
+import 'package:highfive/loading/loading_widget.dart';
+import 'package:highfive/highfive/list/highfive_list_widget.dart';
 import 'package:highfive/home/home_bloc.dart';
 import 'package:highfive/home/home_event.dart';
 import 'package:highfive/home/home_state.dart';
 import 'package:highfive/locator/locator.dart';
 import 'package:highfive/permission/permission_widget.dart';
-import 'package:highfive/route/highfive_route.dart';
-import 'package:highfive/widget/delete_consent.dart';
+import 'package:highfive/highfive/highfive_route_builder.dart';
+import 'package:highfive/highfive/history/highfive_delete_consent_widget.dart';
+import 'package:i18n_extension/i18n_widget.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart' as Sentry;
+import 'home_widget.i18n.dart';
 
 import '../highfive/history/highfive_history_widget.dart';
-import '../login/login.dart';
+import '../login/login_widget.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,13 +50,22 @@ runZonedApp() {
     runApp(
       new OverlaySupport(
         child: MaterialApp(
+          localizationsDelegates: [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: [
+            const Locale("ru", ''),
+            const Locale("en", '')
+          ],
           navigatorKey: key,
-          home: new App(),
+          home: I18n(child: new App(), initialLocale: Locale("ru"),),
           theme: ThemeData(
             primaryColor: Colors.white,
           ),
           routes: {"delete-highfive": (context) => DeleteConsentWidget(), "highfive-list": (context) => HighfiveListWidget()},
-          title: 'Пятюня app',
+          title: 'Пятюня app'.i18n,
           onGenerateRoute: (settings) {
             if (settings.name == "highfive") {
               return HighFiveRoute.createInstance(settings);
@@ -105,7 +117,7 @@ class App extends StatelessWidget {
                 key: new UniqueKey(),
                 child: new Container(
                   child: new Text(
-                    "Вам прислали пятюню!",
+                    "Вам прислали пятюню!".i18n,
                     style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
                   height: 50,

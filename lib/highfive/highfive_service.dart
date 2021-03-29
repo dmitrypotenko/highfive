@@ -1,7 +1,7 @@
 import 'package:highfive/locator/locator.dart';
-import 'package:highfive/model/contacts_holder.dart';
-import 'package:highfive/model/high_five_data.dart';
-import 'package:highfive/model/high_fives_holder.dart';
+import 'package:highfive/contact/contacts_holder.dart';
+import 'package:highfive/highfive/high_five_data.dart';
+import 'package:highfive/highfive/high_fives_holder.dart';
 import 'package:highfive/highfive/highfive_repository.dart';
 import 'package:highfive/route/navigation.dart';
 

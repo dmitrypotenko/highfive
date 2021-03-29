@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:highfive/highfive/highfive_service.dart';
 import 'package:highfive/locator/locator.dart';
-import 'package:highfive/model/high_five_data.dart';
+import 'package:highfive/highfive/high_five_data.dart';
 import 'package:vibration/vibration.dart';
 
 class FirebaseMessageService {

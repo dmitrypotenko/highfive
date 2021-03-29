@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:highfive/model/high_five.dart';
+import 'package:highfive/highfive/high_five_model.dart';
+
+import 'highfive_widget.i18n.dart';
 
 class HighfiveWidget extends StatelessWidget {
-  final HighFive _highFive;
+  final HighFiveModel _highFive;
   final String _comment;
   final String _contact;
   final String _documentId;
@@ -15,7 +17,7 @@ class HighfiveWidget extends StatelessWidget {
     return buildScreen(_highFive, _comment, _contact, _documentId);
   }
 
-  Widget buildScreen(HighFive highFive, String comment, String contact, String docId) {
+  Widget buildScreen(HighFiveModel highFive, String comment, String contact, String docId) {
     return new Scaffold(
       body: SafeArea(
         child: new Container(
@@ -27,10 +29,10 @@ class HighfiveWidget extends StatelessWidget {
                   text: new TextSpan(
                     children: [
                       new TextSpan(text: contact, style: TextStyle(fontWeight: FontWeight.bold)),
-                      new TextSpan(text: ' отправил вам ' + highFive.nameFrom),
+                      new TextSpan(text: ' отправил вам '.i18n + highFive.nameFrom),
                       if (comment != null && comment.isNotEmpty)
                         new TextSpan(
-                            text: ' со словами - ',
+                            text: ' со словами - '.i18n,
                             children: [new TextSpan(text: '\'' + comment + '\'', style: TextStyle(fontWeight: FontWeight.bold))])
                     ],
                     style: new TextStyle(color: Colors.black, fontSize: 20),

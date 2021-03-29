@@ -1,14 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:highfive/firebase/firebase_functions_bloc.dart';
+import 'package:highfive/highfive/send/highfive_send_bloc.dart';
 import 'package:highfive/firebase/firebase_functions_service.dart';
 import 'package:highfive/locator/locator.dart';
-import 'package:highfive/model/high_five.dart';
+import 'package:highfive/highfive/high_five_model.dart';
 import 'package:highfive/route/navigation.dart';
-import 'package:highfive/widget/highfive_send.dart';
+import 'package:highfive/highfive/send/highfive_send_widget.dart';
+import 'comment.i18n.dart';
 
 class CommentRoute extends MaterialPageRoute {
-  CommentRoute(_contactsToSend, HighFive highFive)
+  CommentRoute(_contactsToSend, HighFiveModel highFive)
       : super(builder: (BuildContext context) {
           final _formKey = GlobalKey<FormState>();
           var commentController = new TextEditingController();
@@ -29,7 +30,7 @@ class CommentRoute extends MaterialPageRoute {
                         controller: senderNameController,
                         maxLength: 20,
                         decoration: new InputDecoration(
-                            hintText: 'От кого? (твоя мобила по дефолту)',
+                            hintText: 'От кого? (твоя мобила по дефолту)'.i18n,
                             border: new OutlineInputBorder(borderRadius: BorderRadius.circular(25.0), borderSide: new BorderSide())),
                       ),
                       SizedBox(height: 20),
@@ -38,7 +39,7 @@ class CommentRoute extends MaterialPageRoute {
                         style: new TextStyle(color: Colors.greenAccent),
                         controller: commentController,
                         decoration: new InputDecoration(
-                          hintText: 'Комментарий? (Опционально)',
+                          hintText: 'Комментарий? (Опционально)'.i18n,
                           border: new OutlineInputBorder(borderRadius: BorderRadius.circular(25.0), borderSide: new BorderSide()),
                         ),
                       ),

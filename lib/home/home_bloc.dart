@@ -15,7 +15,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> with WidgetsBindingObserver {
   FirebaseMessageService _firebaseMessageService;
 
   HomeBloc(this._permissionService, this._highfiveService)
-      : super(new HomeState(initialized: false, permissionStatus: PermissionStatus.undetermined));
+      : super(new HomeState(initialized: false, permissionStatus: PermissionStatus.denied));
 
   @override
   Stream<HomeState> mapEventToState(HomeEvent event) async* {
