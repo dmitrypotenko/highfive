@@ -6,19 +6,12 @@ import 'package:highfive/model/high_five.dart';
 import 'package:highfive/model/high_fives_holder.dart';
 import 'package:highfive/route/contacts.dart';
 
-class HighFiveList extends MaterialPageRoute {
-  HighFiveList()
-      : super(builder: (BuildContext context) {
-          return HighFiveListWidget();
-        });
-}
-
-class HighFiveListWidget extends StatefulWidget {
+class HighfiveListWidget extends StatefulWidget {
   @override
-  State createState() => HighFiveListWidgetState();
+  State createState() => HighfiveListWidgetState();
 }
 
-class HighFiveListWidgetState extends State {
+class HighfiveListWidgetState extends State {
   void refresh() {
     setState(() {
       new HighFivesHolder().invalidate();

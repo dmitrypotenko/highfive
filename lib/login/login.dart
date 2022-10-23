@@ -1,16 +1,19 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:highfive/home/home_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:highfive/home/home_event.dart';
+
 
 class SetPhoneNumberWidget extends StatelessWidget {
-  Function(String) _callback;
-
-  SetPhoneNumberWidget(this._callback);
+  SetPhoneNumberWidget();
 
   @override
   Widget build(BuildContext context) {
     final _formKey = GlobalKey<FormState>();
     var controller = new TextEditingController();
+    HomeBloc homebloc = context.read();
     return new Scaffold(
       body: SafeArea(
         child: new Container(
@@ -51,15 +54,15 @@ class SetPhoneNumberWidget extends StatelessWidget {
                           verificationFailed: (FirebaseAuthException e) {
                             print(e);
                             ScaffoldMessenger.of(context).showSnackBar(new SnackBar(content: new Text('Шота пошло не так с вашей смс')));
-                            _callback.call(null);
+                            homebloc.add(SmsHasNotReceived());
                           },
                           codeSent: (String verificationId, int resendToken) {
                             print('code sent');
-                            _callback.call(verificationId);
+                            homebloc.add(SmsSentEvent(verificationId));
                           },
                           codeAutoRetrievalTimeout: (String verificationId) {
                             ScaffoldMessenger.of(context).showSnackBar(new SnackBar(content: new Text('Смска потерялась. Давай еще.')));
-                            _callback.call(null);
+                            homebloc.add(SmsHasNotReceived());
                           },
                         );
                       }
@@ -76,11 +79,11 @@ class SetPhoneNumberWidget extends StatelessWidget {
   }
 }
 
-class SmsRoute extends StatelessWidget {
+class SetSmsWidget extends StatelessWidget {
   String verificationId;
   int resendToken;
 
-  SmsRoute(this.verificationId, {this.resendToken});
+  SetSmsWidget(this.verificationId, {this.resendToken});
 
   @override
   Widget build(BuildContext context) {

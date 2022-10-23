@@ -7,7 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:highfive/main.dart';
+import 'package:highfive/home/home_widget.dart';
 import 'package:highfive/model/contacts_holder.dart';
 
 void main() {

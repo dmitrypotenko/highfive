@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:highfive/model/high_five.dart';
-import 'package:highfive/widget/high_five_widget.dart';
+import 'package:highfive/highfive/highfive_widget.dart';
 
 class HighFiveRoute extends PageRouteBuilder {
   HighFiveRoute(HighFive highFive, String comment, String contact, String documentId)
       : super(
-          pageBuilder: (context, animation, secondaryAnimation) => HighFiveWidget(highFive, comment, contact, documentId),
+          pageBuilder: (context, animation, secondaryAnimation) => HighfiveWidget(highFive, comment, contact, documentId),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return child;
           },
