@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'error.i18n.dart';
 
 class CustomErrorWidget extends StatelessWidget {
 
@@ -14,7 +15,7 @@ class CustomErrorWidget extends StatelessWidget {
     return Scaffold(
       body: Container(
         alignment: Alignment.center,
-        child: new Text("Что пошло не так! Я уже потею, чтобы решить вашу проблемку"),
+        child: new Text("Что пошло не так! Я уже потею, чтобы решить вашу проблемку".i18n),
       ),
     );
   }

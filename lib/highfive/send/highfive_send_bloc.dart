@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:contacts_service/contacts_service.dart';
 
-import 'firebase_functions_service.dart';
+import '../../firebase/firebase_functions_service.dart';
 
 class FirebaseFunctionBloc extends Bloc<SendHighFiveEvent, SendHighFiveState> {
   final FirebaseFunctionsService _firebaseFunctionsService;

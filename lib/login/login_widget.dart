@@ -1,10 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:highfive/home/home_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:highfive/home/home_bloc.dart';
 import 'package:highfive/home/home_event.dart';
 
+import 'login_widget.i18n.dart';
 
 class SetPhoneNumberWidget extends StatelessWidget {
   SetPhoneNumberWidget();
@@ -27,12 +28,12 @@ class SetPhoneNumberWidget extends StatelessWidget {
               children: <Widget>[
                 TextFormField(
                   controller: controller,
-                  decoration: const InputDecoration(
-                    hintText: 'Введите мобильник',
+                  decoration: InputDecoration(
+                    hintText: 'Введите мобильник'.i18n,
                   ),
                   validator: (value) {
                     if (value.isEmpty) {
-                      return 'Введите мобильник';
+                      return 'Введите мобильник'.i18n;
                     }
                     return null;
                   },
@@ -53,7 +54,7 @@ class SetPhoneNumberWidget extends StatelessWidget {
                           },
                           verificationFailed: (FirebaseAuthException e) {
                             print(e);
-                            ScaffoldMessenger.of(context).showSnackBar(new SnackBar(content: new Text('Шота пошло не так с вашей смс')));
+                            ScaffoldMessenger.of(context).showSnackBar(new SnackBar(content: new Text('Шота пошло не так с вашей смс'.i18n)));
                             homebloc.add(SmsHasNotReceived());
                           },
                           codeSent: (String verificationId, int resendToken) {
@@ -61,13 +62,13 @@ class SetPhoneNumberWidget extends StatelessWidget {
                             homebloc.add(SmsSentEvent(verificationId));
                           },
                           codeAutoRetrievalTimeout: (String verificationId) {
-                            ScaffoldMessenger.of(context).showSnackBar(new SnackBar(content: new Text('Смска потерялась. Давай еще.')));
+                            ScaffoldMessenger.of(context).showSnackBar(new SnackBar(content: new Text('Смска потерялась. Давай еще.'.i18n)));
                             homebloc.add(SmsHasNotReceived());
                           },
                         );
                       }
                     },
-                    child: Text('Проверить мобилку'),
+                    child: Text('Проверить мобилку'.i18n),
                   ),
                 ),
               ],
@@ -102,12 +103,12 @@ class SetSmsWidget extends StatelessWidget {
               children: <Widget>[
                 TextFormField(
                   controller: controller,
-                  decoration: const InputDecoration(
-                    hintText: 'Смс код',
+                  decoration: InputDecoration(
+                    hintText: 'Смс код'.i18n,
                   ),
                   validator: (value) {
                     if (value.isEmpty) {
-                      return 'Смс код';
+                      return 'Смс код'.i18n;
                     }
                     return null;
                   },
@@ -126,7 +127,7 @@ class SetSmsWidget extends StatelessWidget {
                         await FirebaseAuth.instance.signInWithCredential(phoneAuthCredential);
                       }
                     },
-                    child: Text('Проверить смску'),
+                    child: Text('Проверить смску'.i18n),
                   ),
                 ),
               ],

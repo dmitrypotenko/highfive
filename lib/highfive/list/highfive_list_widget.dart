@@ -1,10 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:highfive/firebase/loading.dart';
-import 'package:highfive/model/high_five.dart';
-import 'package:highfive/model/high_fives_holder.dart';
-import 'package:highfive/route/contacts.dart';
+import 'package:highfive/loading/loading_widget.dart';
+import 'package:highfive/highfive/high_five_model.dart';
+import 'package:highfive/highfive/high_fives_holder.dart';
+import 'package:highfive/contact/contacts.dart';
+import 'highfive_list_widget.i18n.dart';
 
 class HighfiveListWidget extends StatefulWidget {
   @override
@@ -22,11 +23,11 @@ class HighfiveListWidgetState extends State {
   Widget build(BuildContext context) {
     return new FutureBuilder(
         future: getHighFives(),
-        builder: (BuildContext context, AsyncSnapshot<List<HighFive>> snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<List<HighFiveModel>> snapshot) {
           if (snapshot.hasData) {
             return new Scaffold(
               appBar: new AppBar(
-                title: new Text('Что послать?'),
+                title: new Text('Что послать?'.i18n),
                 actions: [
                   new IconButton(
                     icon: Icon(Icons.refresh),
@@ -85,6 +86,6 @@ class HighfiveListWidgetState extends State {
   }
 }
 
-Future<List<HighFive>> getHighFives() {
+Future<List<HighFiveModel>> getHighFives() {
   return new HighFivesHolder().highFives;
 }

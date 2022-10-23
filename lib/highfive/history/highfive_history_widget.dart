@@ -3,20 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:highfive/home/home_bloc.dart';
 import 'package:highfive/home/home_event.dart';
 import 'package:highfive/locator/locator.dart';
-import 'package:highfive/model/contacts_holder.dart';
-import 'package:highfive/model/high_five.dart';
-import 'package:highfive/model/high_five_data.dart';
-import 'package:highfive/model/high_fives_holder.dart';
+import 'package:highfive/contact/contacts_holder.dart';
+import 'package:highfive/highfive/high_five_model.dart';
+import 'package:highfive/highfive/high_five_data.dart';
+import 'package:highfive/highfive/high_fives_holder.dart';
 import 'package:highfive/route/navigation.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'highfive_history_widget.i18n.dart';
 
 class HighfiveHistoryWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DateFormat formatter = DateFormat('yyyy-MM-dd hh:mm:ss');
     HomeBloc homeBloc = context.read();
-    Widget child = new Text('У вас нет непросмотренных пятюнь');
+    Widget child = new Text('У вас нет непросмотренных пятюнь'.i18n);
     var highfives = homeBloc.state.highfives;
     if (highfives.length > 0) {
       child = new ListView(
@@ -42,7 +43,7 @@ class HighfiveHistoryWidget extends StatelessWidget {
                 tileColor: Theme.of(context).cardColor,
                 leading: FutureBuilder(
                   future: new HighFivesHolder().getById(highfive.highfiveId),
-                  builder: (BuildContext context, AsyncSnapshot<HighFive> snapshot) {
+                  builder: (BuildContext context, AsyncSnapshot<HighFiveModel> snapshot) {
                     if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
                       return new Hero(
                         child: snapshot.data.getNetworkCachedImage(),
@@ -74,7 +75,7 @@ class HighfiveHistoryWidget extends StatelessWidget {
       ),
       bottomNavigationBar: new BottomAppBar(
         child: new ElevatedButton(
-          child: new Text('Хочу послать пятюню'),
+          child: new Text('Хочу послать пятюню'.i18n),
           onPressed: () => Navigator.of(context).pushNamed("highfive-list"),
         ),
       ),
